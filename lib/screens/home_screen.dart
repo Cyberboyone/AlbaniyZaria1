@@ -1,9 +1,8 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../data/sample_lessons.dart';
 import '../models/lesson.dart';
+import '../services/ads_service.dart';
 import '../services/duration_service.dart';
 import '../theme/neumorphic.dart';
 import '../widgets/lesson_card.dart';
@@ -19,16 +18,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _selectedCourse = 'All';
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
 
   @override
   void initState() {
     super.initState();
     DurationService.instance.durationsReady.addListener(_rebuild);
+    _loadBannerAd();
   }
 
   @override
   void dispose() {
     DurationService.instance.durationsReady.removeListener(_rebuild);
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -36,18 +39,23 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() {});
   }
 
+  void _loadBannerAd() {
+    _bannerAd = AdsService.instance.createBannerAd(
+      onLoaded: () {
+        if (mounted) setState(() => _isBannerAdLoaded = true);
+      },
+    );
+  }
+
   List<String> get _courses {
-    final courses =
-        sampleLessons.map((l) => l.course).toSet().toList();
+    final courses = sampleLessons.map((l) => l.course).toSet().toList();
     courses.insert(0, 'All');
     return courses;
   }
 
   List<Lesson> get _lessons {
     if (_selectedCourse == 'All') return sampleLessons;
-    return sampleLessons
-        .where((l) => l.course == _selectedCourse)
-        .toList();
+    return sampleLessons.where((l) => l.course == _selectedCourse).toList();
   }
 
   String _chipLabel(String course) => course;
@@ -122,8 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _selectedCourse = course),
+                      onTap: () => setState(() => _selectedCourse = course),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(
@@ -151,9 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _chipLabel(course),
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: selected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
+                            fontWeight:
+                                selected ? FontWeight.w700 : FontWeight.w500,
                             color: selected
                                 ? AppColors.accent
                                 : AppColors.textSecondary,
@@ -187,48 +193,64 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 8),
 
-            // Lessons list with banner ads every 4 lessons
+            // Lessons list
             Expanded(
               child: _lessons.isEmpty
                   ? const Center(
                       child: Text('No lessons available.',
-                          style:
-                              TextStyle(color: AppColors.textSecondary)),
+                          style: TextStyle(color: AppColors.textSecondary)),
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.only(top: 8, bottom: 24),
-                      itemCount: _lessons.length,
+                      itemCount: _lessons.length + 1,
                       itemBuilder: (context, index) {
-                        final lesson = _lessons[index];
-                        final showBanner =
-                            (index + 1) % 4 == 0 && index < _lessons.length - 1;
-                        return Column(
-                          children: [
-                            LessonCard(
-                              lesson: lesson,
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          PlayerScreen(lesson: lesson)),
-                                );
-                              },
+                        // Show banner ad after every 4 lessons
+                        if (index > 0 && index % 5 == 0 && _bannerAd != null && _isBannerAdLoaded) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: SizedBox(
+                              height: 50,
+                              child: AdWidget(ad: _bannerAd!),
                             ),
-                            if (showBanner && !kIsWeb && Platform.isAndroid)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: SizedBox(
-                                  height: 60,
-                                  child: AndroidView(
-                                    viewType: 'albaniy_banner_ad',
-                                    creationParams: {'index': index},
-                                    creationParamsCodec:
-                                        const StandardMessageCodec(),
-                                  ),
-                                ),
-                              ),
-                          ],
+                          );
+                        }
+
+                        // Adjust index for lessons after ad positions
+                        final lessonIndex = index > 0 && index % 5 == 0
+                            ? index - 1
+                            : index;
+
+                        if (lessonIndex >= _lessons.length) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final lesson = _lessons[lessonIndex];
+                        return LessonCard(
+                          lesson: lesson,
+                          onTap: () {
+                            // Show interstitial ad every 4 lessons
+                            final adCounter = lessonIndex + 1;
+                            if (adCounter % 4 == 0) {
+                              AdsService.instance.showInterstitialAd(
+                                onDismissed: () {
+                                  if (mounted) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              PlayerScreen(lesson: lesson)),
+                                    );
+                                  }
+                                },
+                              );
+                            } else {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        PlayerScreen(lesson: lesson)),
+                              );
+                            }
+                          },
                         );
                       },
                     ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'data/sample_lessons.dart';
 import 'screens/home_screen.dart';
 import 'services/ads_service.dart';
