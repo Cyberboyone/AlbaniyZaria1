@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'data/sample_lessons.dart';
@@ -18,7 +19,9 @@ Future<void> main() async {
       androidNotificationChannelName: 'Audio playback',
       androidNotificationOngoing: true,
     );
-  } catch (_) {}
+  } catch (e, st) {
+    debugPrint('JustAudioBackground.init failed: $e\n$st');
+  }
 
   try {
     DurationService.instance.init();
