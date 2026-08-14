@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'data/sample_lessons.dart';
 import 'screens/home_screen.dart';
 import 'services/ads_service.dart';
@@ -12,16 +10,6 @@ import 'theme/neumorphic.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await JustAudioBackground.init(
-      androidNotificationChannelId: 'com.nakudin.albaniyone.channel.audio',
-      androidNotificationChannelName: 'Audio playback',
-      androidNotificationOngoing: true,
-    );
-  } catch (e, st) {
-    debugPrint('JustAudioBackground.init failed: $e\n$st');
-  }
 
   try {
     DurationService.instance.init();

@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import '../models/lesson.dart';
 import 'progress_service.dart';
 
 /// Singleton that owns the global [AudioPlayer] so the mini-player and
 /// the full player screen share the same playback state.
 ///
-/// Sources are loaded with [MediaItem] tags so just_audio_background can
-/// show the track in the notification shade / lock screen while playing.
+/// Sources are loaded with [MediaItem] tags so the mini-player and
+/// the full player screen can display track info.
 class PlayerService {
   PlayerService._();
   static final instance = PlayerService._();
@@ -69,12 +68,6 @@ class PlayerService {
     await player.setAudioSource(
       AudioSource.uri(
         Uri.parse('asset:///${lesson.audioAssetPath}'),
-        tag: MediaItem(
-          id: lesson.id,
-          title: lesson.title,
-          artist: lesson.scholarName,
-          album: lesson.course,
-        ),
       ),
     );
     _sourceLoaded = true;
