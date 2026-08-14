@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ClipOval(
                     child: Image.asset(
-                      'assets/images/scholar_albaniy.png',
+                      'assets/images/download.jpg',
                       width: 48,
                       height: 48,
                       fit: BoxFit.cover,

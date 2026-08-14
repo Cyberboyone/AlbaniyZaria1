@@ -12,7 +12,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5477),
     timeOfDay: LessonTime.any,
     course: 'Matasa',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'matasa_1_2',
@@ -23,7 +23,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 4427),
     timeOfDay: LessonTime.any,
     course: 'Matasa',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'matasa_1_3',
@@ -34,7 +34,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5604),
     timeOfDay: LessonTime.any,
     course: 'Matasa',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'matasa_1_4',
@@ -45,7 +45,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 4429),
     timeOfDay: LessonTime.any,
     course: 'Matasa',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   // ─── Adaidaita Sahu (Books) ────────────────────
   Lesson(
@@ -57,7 +57,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 7229),
     timeOfDay: LessonTime.any,
     course: 'Adaidaita Sahu',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'adaidaita_2',
@@ -68,7 +68,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 6664),
     timeOfDay: LessonTime.any,
     course: 'Adaidaita Sahu',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'adaidaita_3',
@@ -79,7 +79,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5467),
     timeOfDay: LessonTime.any,
     course: 'Adaidaita Sahu',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'adaidaita_4',
@@ -90,7 +90,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5898),
     timeOfDay: LessonTime.any,
     course: 'Adaidaita Sahu',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
 
   // ─── Bidi'a (Introduction) ─────────────────────
@@ -103,7 +103,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5751),
     timeOfDay: LessonTime.any,
     course: "Bidi'a",
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'bidi_a_2',
@@ -114,7 +114,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5760),
     timeOfDay: LessonTime.any,
     course: "Bidi'a",
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'bidi_a_3',
@@ -125,7 +125,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 3543),
     timeOfDay: LessonTime.any,
     course: "Bidi'a",
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
 
   // ─── Farin Sako ────────────────────────────────
@@ -138,7 +138,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5305),
     timeOfDay: LessonTime.any,
     course: 'Farin Sako',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'farin_sako_2',
@@ -149,7 +149,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5477),
     timeOfDay: LessonTime.any,
     course: 'Farin Sako',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'farin_sako_3',
@@ -160,7 +160,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5554),
     timeOfDay: LessonTime.any,
     course: 'Farin Sako',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'farin_sako_4',
@@ -171,7 +171,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 5547),
     timeOfDay: LessonTime.any,
     course: 'Farin Sako',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
 
   // ─── Nasara Ba Masara Ba ───────────────────────
@@ -184,7 +184,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 4827),
     timeOfDay: LessonTime.any,
     course: 'Nasara Ba Masara Ba',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'nasara_2',
@@ -195,7 +195,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 2267),
     timeOfDay: LessonTime.any,
     course: 'Nasara Ba Masara Ba',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'nasara_3',
@@ -206,7 +206,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 4830),
     timeOfDay: LessonTime.any,
     course: 'Nasara Ba Masara Ba',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'nasara_4',
@@ -217,7 +217,7 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 2290),
     timeOfDay: LessonTime.any,
     course: 'Nasara Ba Masara Ba',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
   Lesson(
     id: 'nasara_5',
@@ -228,6 +228,6 @@ final List<Lesson> sampleLessons = [
     duration: Duration(seconds: 4658),
     timeOfDay: LessonTime.any,
     course: 'Nasara Ba Masara Ba',
-    scholarPhotoPath: 'assets/images/scholar_albaniy.png',
+    scholarPhotoPath: 'assets/images/download.jpg',
   ),
 ];
