@@ -39,6 +39,12 @@ kotlin {
     }
 }
 
+dependencies {
+    // google_mobile_ads depends on work-runtime 2.7.0 which crashes under
+    // AGP 9 R8 full mode (WorkDatabase_Impl ctor stripped). Pin a newer version.
+    implementation("androidx.work:work-runtime:2.11.2")
+}
+
 flutter {
     source = "../.."
 }
