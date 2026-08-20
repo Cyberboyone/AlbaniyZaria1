@@ -9,7 +9,9 @@
 # Google Mobile Ads
 -keep class com.google.android.gms.ads.** { *; }
 
-# just_audio
+# just_audio (media3 + legacy exoplayer2)
+-keep class androidx.media3.** { *; }
+-dontwarn androidx.media3.**
 -keep class com.google.android.exoplayer2.** { *; }
 -dontwarn com.google.android.exoplayer2.**
 
