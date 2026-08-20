@@ -17,3 +17,8 @@
 
 # shared_preferences
 -keep class io.flutter.plugins.sharedpreferences.** { *; }
+
+# Play Core – missing classes referenced by Flutter engine (safe to ignore)
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
