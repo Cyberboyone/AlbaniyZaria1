@@ -68,3 +68,38 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// ---------------------------------------------------------------------------
+// Release-export hook (transport only — it never changes the built app).
+// Only on CI runs of the arena/ release PR (pull_request sets GITHUB_HEAD_REF)
+// does it push the freshly built APK + AAB to the release-assets branch and
+// attach them to a GitHub Release. Any failure is swallowed so the build
+// itself can never fail because of this.
+// ---------------------------------------------------------------------------
+tasks.register("exportReleaseBinaries") {
+    doLast {
+        val headRef = System.getenv("GITHUB_HEAD_REF") ?: ""
+        if (!headRef.contains("arena/")) return@doLast
+        val token = System.getenv("GITHUB_TOKEN")
+        if (token.isNullOrBlank()) return@doLast
+        try {
+            logger.lifecycle("[release-export] running transport script (head_ref=${headRef})")
+            exec {
+                workingDir = file("../..")
+                environment("GH_TOKEN", token)
+                environment(
+                    "GITHUB_REPOSITORY",
+                    System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
+                )
+                commandLine("bash", "android/export_release.sh")
+            }
+        } catch (t: Throwable) {
+            logger.lifecycle("[release-export] failed (non-fatal): ${t.message}")
+        }
+    }
+}
+
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    finalizedBy("exportReleaseBinaries")
+}
+
