@@ -85,40 +85,40 @@ val exportRepoRoot = project.rootDir.parentFile
 val exportScript = exportRepoRoot.resolve("android/export_release.sh")
 
 val pushCiMarker: (String) -> Unit = { branch ->
-    if (!exportHeadRef.contains("arena/")) return@pushCiMarker
-    if (exportToken.isEmpty()) return@pushCiMarker
-    try {
-        val markerDir = File(System.getProperty("java.io.tmpdir"), "albaniy-ci-" + branch)
-        markerDir.deleteRecursively()
-        markerDir.mkdirs()
-        markerDir.resolve("marker.txt").writeText(
-            "branch=$branch\n" +
-                "time=${java.time.Instant.now()}\n" +
-                "head_ref=$exportHeadRef\n" +
-                "github_ref=${System.getenv("GITHUB_REF") ?: "-"}\n" +
-                "token_len=${exportToken.length}\n" +
-                "gradle_tasks=${gradle.startParameter.taskNames}\n" +
-                "project=${project.path}\n" +
-                "build_outputs_exists=${exportRepoRoot.resolve("build/app/outputs").exists()}\n"
-        )
-        val bash = (
-            "set -e\n" +
-                "cd \"${markerDir.absolutePath}\"\n" +
-                "git init -q -b ${branch}\n" +
-                "git config user.name \"github-actions[bot]\"\n" +
-                "git config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\n" +
-                "git add -A\n" +
-                "git commit -qm \"marker ${branch} \$(date -u +%s)\"\n" +
-                "git remote add origin \"https://x-access-token:\${'$'}CI_TOKEN@github.com/${exportRepoSlug}.git\"\n" +
-                "git push -f origin ${branch} 2>&1 | tail -1\n"
-        )
-        val pb = ProcessBuilder("bash", "-c", bash)
-        pb.directory(markerDir)
-        pb.environment()["CI_TOKEN"] = exportToken
-        pb.inheritIO()
-        pb.start().waitFor()
-    } catch (t: Throwable) {
-        logger.lifecycle("[release-export] marker push failed (non-fatal): ${t.message}")
+    if (exportHeadRef.contains("arena/") && exportToken.isNotEmpty()) {
+        try {
+            val markerDir = File(System.getProperty("java.io.tmpdir"), "albaniy-ci-" + branch)
+            markerDir.deleteRecursively()
+            markerDir.mkdirs()
+            markerDir.resolve("marker.txt").writeText(
+                "branch=$branch\n" +
+                    "time=${java.time.Instant.now()}\n" +
+                    "head_ref=$exportHeadRef\n" +
+                    "github_ref=${System.getenv("GITHUB_REF") ?: "-"}\n" +
+                    "token_len=${exportToken.length}\n" +
+                    "gradle_tasks=${gradle.startParameter.taskNames}\n" +
+                    "project=${project.path}\n" +
+                    "build_outputs_exists=${exportRepoRoot.resolve("build/app/outputs").exists()}\n"
+            )
+            val bash = (
+                "set -e\n" +
+                    "cd \"${markerDir.absolutePath}\"\n" +
+                    "git init -q -b ${branch}\n" +
+                    "git config user.name \"github-actions[bot]\"\n" +
+                    "git config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\n" +
+                    "git add -A\n" +
+                    "git commit -qm \"marker ${branch} \$(date -u +%s)\"\n" +
+                    "git remote add origin \"https://x-access-token:\${'$'}CI_TOKEN@github.com/${exportRepoSlug}.git\"\n" +
+                    "git push -f origin ${branch} 2>&1 | tail -1\n"
+            )
+            val pb = ProcessBuilder("bash", "-c", bash)
+            pb.directory(markerDir)
+            pb.environment()["CI_TOKEN"] = exportToken
+            pb.inheritIO()
+            pb.start().waitFor()
+        } catch (t: Throwable) {
+            logger.lifecycle("[release-export] marker push failed (non-fatal): ${t.message}")
+        }
     }
 }
 
