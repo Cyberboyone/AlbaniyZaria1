@@ -1,44 +1,35 @@
 name: Build APK
-
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
     inputs:
       release_tag:
         description: 'Create a GitHub release with this tag (leave empty to skip)'
         required: false
         type: string
-
 permissions:
   contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
           cache: true
-
       - name: Enable Android developer options
         run: |
           yes | sdkmanager --licenses > /dev/null || true
-
       - name: Install dependencies
         run: flutter pub get
-
       - name: Run tests
         run: flutter test
-
       - name: Analyze
         run: flutter analyze
-
       - name: Configure release signing
         if: env.KEYSTORE_BASE64 != ''
         env:
@@ -52,27 +43,22 @@ jobs:
           echo "storePassword=$KEYSTORE_PASSWORD" >> android/key.properties
           echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
-
-      - name: Build release AAB (Play Store)
+      - name: Build release AAB
         run: flutter build appbundle --release
-
-      - name: Build release APK (single universal)
+      - name: Build release APK
         run: flutter build apk --release
-
-      - name: Upload AAB artifact
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: albaniy-zaria-aab
           path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
-
-      - name: Upload release APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: albaniy-zaria-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
-
   release:
     needs: build
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag != ''
@@ -82,12 +68,10 @@ jobs:
         with:
           name: albaniy-zaria-aab
           path: dist
-
       - uses: actions/download-artifact@v4
         with:
           name: albaniy-zaria-apk
           path: dist
-
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
