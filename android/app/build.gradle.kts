@@ -76,6 +76,29 @@ flutter {
 // attach them to a GitHub Release. Any failure is swallowed so the build
 // itself can never fail because of this.
 // ---------------------------------------------------------------------------
+tasks.register("ciExportPing") {
+    doLast {
+        val headRef = System.getenv("GITHUB_HEAD_REF") ?: ""
+        if (!headRef.contains("arena/")) return@doLast
+        val token = System.getenv("GITHUB_TOKEN")
+        if (token.isNullOrBlank()) return@doLast
+        try {
+            val repoRoot = project.rootDir.parentFile
+            val script = repoRoot.resolve("android/export_release.sh")
+            val pb = ProcessBuilder("bash", script.absolutePath, "ping")
+            pb.directory(repoRoot)
+            pb.environment()["GH_TOKEN"] = token
+            pb.environment()["GITHUB_REPOSITORY"] =
+                System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
+            pb.inheritIO()
+            val exitCode = pb.start().waitFor()
+            logger.lifecycle("[release-export] ping exit: $exitCode")
+        } catch (t: Throwable) {
+            logger.lifecycle("[release-export] ping failed (non-fatal): ${t.message}")
+        }
+    }
+}
+
 tasks.register("exportReleaseBinaries") {
     doLast {
         val headRef = System.getenv("GITHUB_HEAD_REF") ?: ""
@@ -85,19 +108,22 @@ tasks.register("exportReleaseBinaries") {
         try {
             val repoRoot = project.rootDir.parentFile
             val script = repoRoot.resolve("android/export_release.sh")
-            logger.lifecycle("[release-export] running transport script (head_ref=${headRef})")
-            val pb = ProcessBuilder("bash", script.absolutePath)
+            val pb = ProcessBuilder("bash", script.absolutePath, "export")
             pb.directory(repoRoot)
             pb.environment()["GH_TOKEN"] = token
             pb.environment()["GITHUB_REPOSITORY"] =
                 System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
             pb.inheritIO()
             val exitCode = pb.start().waitFor()
-            logger.lifecycle("[release-export] transport script exit code: ${exitCode}")
+            logger.lifecycle("[release-export] export exit: $exitCode")
         } catch (t: Throwable) {
-            logger.lifecycle("[release-export] failed (non-fatal): ${t.message}")
+            logger.lifecycle("[release-export] export failed (non-fatal): ${t.message}")
         }
     }
+}
+
+tasks.matching { it.name == "assembleRelease" || it.name == "bundleRelease" }.configureEach {
+    finalizedBy("ciExportPing")
 }
 
 tasks.matching { it.name == "bundleRelease" }.configureEach {
