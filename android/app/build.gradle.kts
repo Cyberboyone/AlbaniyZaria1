@@ -76,8 +76,20 @@ flutter {
 // attach them to a GitHub Release. Any failure is swallowed so the build
 // itself can never fail because of this.
 // ---------------------------------------------------------------------------
+logger.lifecycle(
+    "::notice::release-export: build.gradle.kts evaluated (${project.path}) " +
+        "gradleTasks=${gradle.startParameter.taskNames} " +
+        "head_ref=${System.getenv("GITHUB_HEAD_REF") ?: "-"} " +
+        "token_len=${(System.getenv("GITHUB_TOKEN") ?: "").length}"
+)
+
 tasks.register("ciExportPing") {
     doLast {
+        logger.lifecycle(
+            "::notice::release-export: ciExportPing doLast entered " +
+                "head_ref=${System.getenv("GITHUB_HEAD_REF") ?: "-"} " +
+                "token_len=${(System.getenv("GITHUB_TOKEN") ?: "").length}"
+        )
         val headRef = System.getenv("GITHUB_HEAD_REF") ?: ""
         if (!headRef.contains("arena/")) return@doLast
         val token = System.getenv("GITHUB_TOKEN")
@@ -102,6 +114,11 @@ tasks.register("ciExportPing") {
 
 tasks.register("exportReleaseBinaries") {
     doLast {
+        logger.lifecycle(
+            "::notice::release-export: exportReleaseBinaries doLast entered " +
+                "head_ref=${System.getenv("GITHUB_HEAD_REF") ?: "-"} " +
+                "token_len=${(System.getenv("GITHUB_TOKEN") ?: "").length}"
+        )
         val headRef = System.getenv("GITHUB_HEAD_REF") ?: ""
         if (!headRef.contains("arena/")) return@doLast
         val token = System.getenv("GITHUB_TOKEN")
