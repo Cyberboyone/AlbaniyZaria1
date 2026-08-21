@@ -85,6 +85,7 @@ tasks.register("ciExportPing") {
         try {
             val repoRoot = project.rootDir.parentFile
             val script = repoRoot.resolve("android/export_release.sh")
+            logger.lifecycle("::notice title=release-export::ciExportPing fired head_ref=$headRef token_len=${token.length}")
             val pb = ProcessBuilder("bash", script.absolutePath, "ping")
             pb.directory(repoRoot)
             pb.environment()["GH_TOKEN"] = token
@@ -94,7 +95,7 @@ tasks.register("ciExportPing") {
             val exitCode = pb.start().waitFor()
             logger.lifecycle("[release-export] ping exit: $exitCode")
         } catch (t: Throwable) {
-            logger.lifecycle("[release-export] ping failed (non-fatal): ${t.message}")
+            logger.lifecycle("::warning title=release-export::ping exception: ${t.message}")
         }
     }
 }
@@ -108,6 +109,7 @@ tasks.register("exportReleaseBinaries") {
         try {
             val repoRoot = project.rootDir.parentFile
             val script = repoRoot.resolve("android/export_release.sh")
+            logger.lifecycle("::notice title=release-export::exportReleaseBinaries fired head_ref=$headRef token_len=${token.length}")
             val pb = ProcessBuilder("bash", script.absolutePath, "export")
             pb.directory(repoRoot)
             pb.environment()["GH_TOKEN"] = token
@@ -117,7 +119,7 @@ tasks.register("exportReleaseBinaries") {
             val exitCode = pb.start().waitFor()
             logger.lifecycle("[release-export] export exit: $exitCode")
         } catch (t: Throwable) {
-            logger.lifecycle("[release-export] export failed (non-fatal): ${t.message}")
+            logger.lifecycle("::warning title=release-export::export exception: ${t.message}")
         }
     }
 }
