@@ -56,9 +56,9 @@ class Neumorphic extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.shadowDark.withValues(alpha: 0.55),
+              AppColors.shadowDark.withOpacity(0.55),
               AppColors.background,
-              AppColors.shadowLight.withValues(alpha: 0.7),
+              AppColors.shadowLight.withOpacity(0.7),
             ],
             stops: const [0.0, 0.5, 1.0],
           ),
@@ -92,7 +92,7 @@ class Neumorphic extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowDark.withValues(alpha: 0.55),
+            color: AppColors.shadowDark.withOpacity(0.55),
             offset: Offset(6 * intensity, 6 * intensity),
             blurRadius: 14 * intensity,
           ),
