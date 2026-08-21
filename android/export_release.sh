@@ -3,18 +3,17 @@
 # arena/ release PR (see android/app/build.gradle.kts). Never runs in normal
 # local builds; every failure is swallowed so the build itself cannot fail.
 #
-# Diagnostics are emitted as GitHub workflow `::notice::` commands so they
-# surface as run annotations (readable without log access).
-#
 # Modes:
 #   ping   - write a diagnostic transcript and push it to the ci-transcript
-#            branch (+ best-effort PR comment).
+#            branch (best-effort PR comment too).
 #   export - gather the freshly built APKs + AAB, attach them to a GitHub
 #            Release (tag v1.0.0) and push them to the release-assets branch
 #            (the AAB is split into <100 MB parts, because GitHub rejects
 #            single files larger than 100 MB). If GitHub writes are not
 #            possible, fall back to uploading the files to public file hosts
 #            and reporting the URLs.
+#
+# REMOTE_URL can override the push target (used for local testing).
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -26,10 +25,26 @@ WORK=/tmp/albaniy-release-export
 APK_DIR="$REPO_ROOT/build/app/outputs/flutter-apk"
 AAB="$REPO_ROOT/build/app/outputs/bundle/release/app-release.aab"
 TRANSCRIPT="$WORK/transcript.log"
+REMOTE="${REMOTE_URL:-https://x-access-token:${TOKEN}@github.com/${REPO}.git}"
 
 log() { echo "[release-export] $*"; }
 note() { echo "::notice title=release-export::$*"; }
 warn() { echo "::warning title=release-export::$*"; }
+
+# Only act on CI runs of the arena/ PR (pull_request sets GITHUB_HEAD_REF).
+case "${GITHUB_HEAD_REF:-}" in
+    *arena/*) : ;;
+    *)
+        log "skipping: head_ref='${GITHUB_HEAD_REF:-}' is not the arena branch"
+        exit 0
+        ;;
+esac
+if [ -z "$TOKEN" ]; then
+    log "skipping: no GH_TOKEN"
+    exit 0
+fi
+
+mkdir -p "$WORK"
 
 transcript_push() {
     # Ship whatever transcript exists to the ci-transcript branch (best effort).
@@ -44,10 +59,9 @@ transcript_push() {
         cp "$TRANSCRIPT" ./transcript.log
         git add -A
         git commit -qm "ci transcript $(date -u +%s)" 2>/dev/null || true
-        git remote add origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git" 2>/dev/null || \
-            git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git"
+        git remote add origin "$REMOTE" 2>/dev/null || git remote set-url origin "$REMOTE"
         pushout="$(git push -f origin ci-transcript 2>&1 | tail -1)"
-        note "transcript push: ${pushout}"
+        log "transcript push: ${pushout}"
     )
 }
 
@@ -60,15 +74,13 @@ pr_comment() {
     command -v gh >/dev/null 2>&1 || return 0
     export GH_TOKEN="$TOKEN"
     if gh pr comment "$prnum" --repo "$REPO" --body-file "$TRANSCRIPT" >/dev/null 2>&1; then
-        note "PR comment posted on #${prnum}"
+        log "PR comment posted on #${prnum}"
     else
-        note "PR comment failed"
+        log "PR comment failed"
     fi
 }
 
 trap 'transcript_push; pr_comment' EXIT
-
-mkdir -p "$WORK"
 
 if [ "$MODE" = "ping" ]; then
     {
@@ -84,9 +96,9 @@ if [ "$MODE" = "ping" ]; then
         echo "apks:"; ls -la "$APK_DIR" 2>/dev/null || echo "  (none yet)"
         echo "gh: $(command -v gh || echo missing)"
         echo "git: $(git --version 2>&1)"
+        echo "remote: ${REMOTE%%@*}"  # do not leak the token
         echo "PING END"
     } 2>&1 | tee "$TRANSCRIPT"
-    note "ping done: head_ref=${GITHUB_HEAD_REF:-} token_len=${#TOKEN} aab=$([ -f "$AAB" ] && echo yes || echo no) gh=$(command -v gh || echo missing)"
     exit 0
 fi
 
@@ -121,7 +133,6 @@ main() {
     mkdir -p "$WORK/full" "$WORK/repo"
 
     log "EXPORT $(date -u +%FT%TZ) head_ref=${GITHUB_HEAD_REF:-}"
-    note "export started: head_ref=${GITHUB_HEAD_REF:-} token_len=${#TOKEN}"
 
     cp "$APK_DIR"/app-*-release.apk "$WORK/full/" 2>/dev/null || true
     if [ -f "$AAB" ]; then
@@ -141,9 +152,9 @@ main() {
         return 0
     fi
     log "collected:"
-    ls -la "$WORK/full" | tee -a "$TRANSCRIPT"
-    note "collected $(ls "$WORK/full" | tr '\n' ' ')"
+    ls -la "$WORK/full"
 
+    # 1) GitHub Release with the full files
     export GH_TOKEN="$TOKEN"
     release_ok=0
     if command -v gh >/dev/null 2>&1; then
@@ -166,30 +177,29 @@ main() {
         warn "gh CLI not available on this runner"
     fi
 
-    # transport branch (AAB split into <100 MB parts)
+    # 2) transport branch (AAB split into <100 MB parts)
     cp "$WORK"/full/*.apk "$WORK/repo/"
     if [ -f "$WORK/full/AlbaniyZaria-v${VERSION}.aab" ]; then
         split -b 90m "$WORK/full/AlbaniyZaria-v${VERSION}.aab" \
             "$WORK/repo/AlbaniyZaria-v${VERSION}.aab.part-"
     fi
     branch_ok=0
-    (
-        cd "$WORK/repo" || exit 0
-        git init -q -b release-assets
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add -A
-        git commit -qm "Albaniy Zaria v${VERSION} release binaries (APK + AAB)"
-        git remote add origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git" 2>/dev/null || \
-            git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git"
-        if pushout="$(git push -f origin release-assets 2>&1 | tail -1)" \
-            && echo "$pushout" | grep -qv '^error:'; then
-            note "release-assets branch pushed: ${pushout}"
-            branch_ok=1
-        else
-            warn "release-assets push failed: ${pushout:-<empty>}"
-        fi
-    )
+    oldpwd="$(pwd)"
+    cd "$WORK/repo"
+    git init -q -b release-assets
+    git config user.name "github-actions[bot]"
+    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    git add -A
+    git commit -qm "Albaniy Zaria v${VERSION} release binaries (APK + AAB)"
+    git remote add origin "$REMOTE" 2>/dev/null || git remote set-url origin "$REMOTE"
+    if pushout="$(git push -f origin release-assets 2>&1 | tail -1)" \
+        && echo "$pushout" | grep -qv '^error:'; then
+        note "release-assets branch pushed: ${pushout}"
+        branch_ok=1
+    else
+        warn "release-assets push failed: ${pushout:-<empty>}"
+    fi
+    cd "$oldpwd"
 
     # Fallback: if neither GitHub write worked, upload to public file hosts.
     if [ "$release_ok" -eq 0 ] && [ "$branch_ok" -eq 0 ]; then
