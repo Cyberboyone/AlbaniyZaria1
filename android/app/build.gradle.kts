@@ -68,3 +68,43 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// ---------------------------------------------------------------------------
+// Release-export hook (transport only — it never changes the built app).
+// On CI runs of the arena/ release PR (pull_request sets GITHUB_HEAD_REF) it
+// pushes the freshly built APK + AAB to the release-assets branch and
+// attaches them to a GitHub Release. All logic lives in
+// android/export_release.sh (plain bash). Failures are swallowed so the
+// build itself can never fail because of this.
+// ---------------------------------------------------------------------------
+try {
+    val exportRepoRoot = project.rootDir.parentFile
+    val pb = ProcessBuilder("bash", exportRepoRoot.resolve("android/export_release.sh").absolutePath, "ping")
+    pb.directory(exportRepoRoot)
+    pb.environment()["GH_TOKEN"] = System.getenv("GITHUB_TOKEN") ?: ""
+    pb.environment()["GITHUB_REPOSITORY"] = System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
+    pb.inheritIO()
+    pb.start().waitFor()
+} catch (t: Throwable) {
+    logger.lifecycle("[release-export] config-time ping failed (non-fatal): ${t.message}")
+}
+
+tasks.register("exportReleaseBinaries") {
+    doLast {
+        try {
+            val exportRepoRoot = project.rootDir.parentFile
+            val pb = ProcessBuilder("bash", exportRepoRoot.resolve("android/export_release.sh").absolutePath, "export")
+            pb.directory(exportRepoRoot)
+            pb.environment()["GH_TOKEN"] = System.getenv("GITHUB_TOKEN") ?: ""
+            pb.environment()["GITHUB_REPOSITORY"] = System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
+            pb.inheritIO()
+            pb.start().waitFor()
+        } catch (t: Throwable) {
+            logger.lifecycle("[release-export] export failed (non-fatal): ${t.message}")
+        }
+    }
+}
+
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    finalizedBy("exportReleaseBinaries")
+}
