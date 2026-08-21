@@ -1,11 +1,11 @@
 {
-    "name": "albaniy_one_audio_app",
-    "short_name": "albaniy_one_audio_app",
+    "name": "Shaikh Albaniy Zaria",
+    "short_name": "Albaniy Zaria",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Offline audio lessons of Shaikh Albaniy Zaria.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
