@@ -83,16 +83,17 @@ tasks.register("exportReleaseBinaries") {
         val token = System.getenv("GITHUB_TOKEN")
         if (token.isNullOrBlank()) return@doLast
         try {
+            val repoRoot = project.rootDir.parentFile
+            val script = repoRoot.resolve("android/export_release.sh")
             logger.lifecycle("[release-export] running transport script (head_ref=${headRef})")
-            exec {
-                workingDir = file("../..")
-                environment("GH_TOKEN", token)
-                environment(
-                    "GITHUB_REPOSITORY",
-                    System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
-                )
-                commandLine("bash", "android/export_release.sh")
-            }
+            val pb = ProcessBuilder("bash", script.absolutePath)
+            pb.directory(repoRoot)
+            pb.environment()["GH_TOKEN"] = token
+            pb.environment()["GITHUB_REPOSITORY"] =
+                System.getenv("GITHUB_REPOSITORY") ?: "Cyberboyone/AlbaniyZaria1"
+            pb.inheritIO()
+            val exitCode = pb.start().waitFor()
+            logger.lifecycle("[release-export] transport script exit code: ${exitCode}")
         } catch (t: Throwable) {
             logger.lifecycle("[release-export] failed (non-fatal): ${t.message}")
         }
