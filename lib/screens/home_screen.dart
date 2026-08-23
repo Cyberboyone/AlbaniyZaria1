@@ -7,6 +7,7 @@ import '../services/duration_service.dart';
 import '../theme/neumorphic.dart';
 import '../widgets/lesson_card.dart';
 import '../widgets/mini_player.dart';
+import 'about_scholar_screen.dart';
 import 'player_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -96,6 +97,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                  NeumorphicCircleButton(
+                    icon: Icons.info_outline,
+                    size: 44,
+                    iconSize: 20,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const AboutScholarScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   ClipOval(
                     child: Image.asset(
                       'assets/images/download.jpg',
