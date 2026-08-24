@@ -13,7 +13,7 @@ class Lesson {
   final String course; // e.g. "Daurar Baiquniyya", "Dalabul Ilmi"
   final List<String> tags; // e.g. ["gratitude", "dua"]
   final String? arabicLabel; // e.g. "الكهف" - shown in the circular artwork
-  final String? scholarPhotoPath; // e.g. assets/images/scholar_albaniy.png
+  final String? scholarPhotoPath; // e.g. assets/images/download.jpg
 
   Lesson({
     required this.id,

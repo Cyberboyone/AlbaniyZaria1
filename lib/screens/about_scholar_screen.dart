@@ -68,7 +68,7 @@ class AboutScholarScreen extends StatelessWidget {
                         ),
                         child: ClipOval(
                           child: Image.asset(
-                            'assets/images/scholar_albaniy.png',
+                            'assets/images/download.jpg',
                             width: 128,
                             height: 128,
                             fit: BoxFit.cover,

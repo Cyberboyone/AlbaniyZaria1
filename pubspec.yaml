@@ -1,7 +1,7 @@
 name: albaniy_one_audio_app
 description: Offline audio lessons app for Shaikh Albaniy Zaria.
 publish_to: 'none'
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -31,8 +31,6 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/images/download.jpg"
-  adaptive_icon_background: "#2E5A46"
-  adaptive_icon_foreground: "assets/images/download.jpg"
 
 flutter:
   uses-material-design: true
