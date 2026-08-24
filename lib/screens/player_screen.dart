@@ -201,7 +201,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     height: 64,
                                     decoration: BoxDecoration(
                                       color: AppColors.accent
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(Icons.person,
@@ -228,7 +228,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   horizontal: 12, vertical: 4),
                               decoration: BoxDecoration(
                                 color: AppColors.accent
-                                    .withOpacity(0.1),
+                                    .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -315,7 +315,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                   decoration: BoxDecoration(
                                                     color: AppColors
                                                         .shadowDark
-                                                        .withOpacity(0.4),
+                                                        .withValues(alpha: 0.4),
                                                     borderRadius:
                                                         BorderRadius
                                                             .circular(3),
@@ -352,7 +352,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                       BoxShadow(
                                                         color: AppColors
                                                             .accent
-                                                            .withOpacity(0.4),
+                                                            .withValues(alpha: 0.4),
                                                         blurRadius: 6,
                                                         spreadRadius: 1,
                                                       ),

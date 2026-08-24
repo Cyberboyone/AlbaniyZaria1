@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'data/sample_lessons.dart';
 import 'screens/home_screen.dart';

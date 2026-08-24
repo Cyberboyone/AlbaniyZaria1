@@ -55,7 +55,7 @@ class AboutScholarScreen extends StatelessWidget {
                           color: AppColors.background,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.shadowDark.withOpacity(0.55),
+                              color: AppColors.shadowDark.withValues(alpha: 0.55),
                               offset: const Offset(6, 6),
                               blurRadius: 14,
                             ),
