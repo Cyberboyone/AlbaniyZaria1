@@ -214,10 +214,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.only(top: 8, bottom: 24),
-                      itemCount: _lessons.length + 1,
+                      // Show a banner ad after every 4 lessons. Item count must
+                      // include the ad rows so lessons are never repeated.
+                      itemCount: _lessons.length + (_bannerAd != null && _isBannerAdLoaded ? _lessons.length ~/ 4 : 0),
                       itemBuilder: (context, index) {
-                        // Show banner ad after every 4 lessons
-                        if (index > 0 && index % 5 == 0 && _bannerAd != null && _isBannerAdLoaded) {
+                        final adLoaded = _bannerAd != null && _isBannerAdLoaded;
+
+                        // Banner ad occupies positions 5,10,15,... in the list
+                        if (adLoaded && index > 0 && index % 5 == 0) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -228,12 +232,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }
 
-                        // Adjust index for lessons after ad positions
-                        final lessonIndex = index > 0 && index % 5 == 0
-                            ? index - 1
+                        // Number of ads shown before this index shifts the
+                        // lesson mapping forward, keeping every lesson once.
+                        final lessonIndex = adLoaded
+                            ? index - (index ~/ 5)
                             : index;
 
-                        if (lessonIndex >= _lessons.length) {
+                        if (lessonIndex < 0 || lessonIndex >= _lessons.length) {
                           return const SizedBox.shrink();
                         }
 
